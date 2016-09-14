@@ -9,7 +9,6 @@
   <meta name="viewport" content="width=device-width">
   <link rel="stylesheet" href="styles/bootstrap.css">
   <link rel="stylesheet" href="styles/style.css" />
-  <link rel="stylesheet" href="../dist/angular-datepicker.css" />
 </head>
 <body ng-app="sample">
   <div class="row-fluid" ng-controller="DemoController">
@@ -68,7 +67,7 @@
 
       <form name="demoForm">
       <div>
-        <h5>Min ({{demoForm.pickerMinDate.$error.min ? 'Min: invalid' : 'Min: valid'}})</h5>        
+        <h5>Min ({{demoForm.pickerMinDate.$error.min ? 'Min: invalid' : 'Min: valid'}})</h5>
         <input date-time name="pickerMinDate" ng-model="dates.today" id="pickerMinDate" min-date="minDate" view="date" min-view="hours" timezone="UTC" format="lll">
       </div>
 

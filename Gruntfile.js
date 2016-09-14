@@ -191,7 +191,7 @@ module.exports = function (grunt) {
         src: ['<%= yeoman.app %>/scripts/{datePicker,input,dateRange,datePickerUtils}.js', '<%= yeoman.tmp %>/templates.js'],
         dest: '<%= yeoman.dist %>/angular-datepicker.js',
         options: {
-          banner:'\(function (global, factory) {\'use strict\';var fnc;fnc = (typeof exports === \'object\' && typeof module !== \'undefined\') ? module.exports = factory(require(\'angular\'), require(\'moment\')) :(typeof define === \'function\' && define.amd) ? define([\'angular\', \'moment\'], factory) :factory(global.angular, global.moment);}(this, function (angular, moment) {\n',
+          banner:'\(function (global, factory) {\'use strict\';var fnc;fnc = (typeof exports === \'object\' && typeof module !== \'undefined\') ? module.exports = factory(window.angular, require(\'moment\')) :(typeof define === \'function\' && define.amd) ? define([\'angular\', \'moment\'], factory) :factory(global.angular, global.moment);}(this, function (angular, moment) {\n',
           footer:'}));',
           // Replace all 'use strict' statements in the code with a single one at the top
           process: function(src) {

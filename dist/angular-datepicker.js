@@ -1,14 +1,7 @@
-(function (global, factory) {'use strict';var fnc;fnc = (typeof exports === 'object' && typeof module !== 'undefined') ? module.exports = factory(require('angular'), require('moment')) :(typeof define === 'function' && define.amd) ? define(['angular', 'moment'], factory) :factory(global.angular, global.moment);}(this, function (angular, moment) {
-//(function (global, factory) {
-//  'use strict';
-//  var fnc;
-//  fnc = (typeof exports === 'object' && typeof module !== 'undefined') ? module.exports = factory(require('angular'), require('moment')) :
-//        (typeof define === 'function' && define.amd) ? define(['angular', 'moment'], factory) :
-//        factory(global.angular, global.moment);
-//}(this, function (angular, moment) {
-var Module = angular.module('datePicker', []);
-
-  Module.constant('datePickerConfig', {
+(function (global, factory) {'use strict';var fnc;fnc = (typeof exports === 'object' && typeof module !== 'undefined') ? module.exports = factory(window.angular, require('moment')) :(typeof define === 'function' && define.amd) ? define(['angular', 'moment'], factory) :factory(global.angular, global.moment);}(this, function (angular, moment) {
+// define module
+angular.module('datePicker', [])
+  .constant('datePickerConfig', {
     template: 'templates/datepicker.html',
     view: 'month',
     views: ['year', 'month', 'date', 'hours', 'minutes'],
@@ -26,19 +19,17 @@ var Module = angular.module('datePicker', []);
       minutes: ['minutes', 'isSameMinutes'],
     },
     step: 5
-  });
-
-//Moment format filter.
-  Module.filter('mFormat', function () {
+  })
+  //Moment format filter.
+  .filter('mFormat', function () {
     return function (m, format, tz) {
       if (!(moment.isMoment(m))) {
-        return (m) ? moment(m).format(format) : '';
+        return moment(m).format(format);
       }
       return tz ? moment.tz(m, tz).format(format) : m.format(format);
     };
-  });
-
-  Module.directive('datePicker', ['datePickerConfig', 'datePickerUtils', function datePickerDirective(datePickerConfig, datePickerUtils) {
+  })
+  .directive('datePicker', ['datePickerConfig', 'datePickerUtils', function datePickerDirective(datePickerConfig, datePickerUtils) {
 
     //noinspection JSUnusedLocalSymbols
     return {
@@ -365,16 +356,9 @@ var Module = angular.module('datePicker', []);
       }
     };
   }]);
-//}));
 
-//(function (global, factory) {
-//  'use strict';
-//  var fnc;
-//  fnc = (typeof exports === 'object' && typeof module !== 'undefined') ? module.exports = factory(require('angular'), require('moment')) :
-//    (typeof define === 'function' && define.amd) ? define(['angular', 'moment'], factory) :
-//      factory(global.angular, global.moment);
-//}(this, function (angular, moment) {
-angular.module('datePicker').factory('datePickerUtils', function () {
+angular.module('datePicker')
+  .factory('datePickerUtils', function () {
     var tz, firstDay;
     var createNewDate = function (year, month, day, hour, minute) {
       var utc = Date.UTC(year | 0, month | 0, day | 0, hour | 0, minute | 0);
@@ -596,24 +580,25 @@ angular.module('datePicker').factory('datePickerUtils', function () {
 
         return result;
       },
+      //Checks if an event targeted at a specific picker, via either a string name, or an array of strings.
       eventIsForPicker: function (targetIDs, pickerID) {
-        //Checks if an event targeted at a specific picker, via either a string name, or an array of strings.
-        return (angular.isArray(targetIDs) && targetIDs.indexOf(pickerID) > -1 || targetIDs === pickerID);
+        function matches(id) {
+          if (id instanceof RegExp) {
+            return id.test(pickerID);
+          }
+          return id === pickerID;
+        }
+
+        if (angular.isArray(targetIDs)) {
+          return targetIDs.some(matches);
+        }
+        return matches(targetIDs);
       }
     };
   });
-//}));
 
-//(function (global, factory) {
-//  'use strict';
-//  var fnc;
-//  fnc = (typeof exports === 'object' && typeof module !== 'undefined') ? module.exports = factory(require('angular'), require('moment')) :
-//    (typeof define === 'function' && define.amd) ? define(['angular', 'moment'], factory) :
-//      factory(global.angular, global.moment);
-//}(this, function (angular, moment) {
-var Module = angular.module('datePicker');
-
-  Module.directive('dateRange', ['$compile', 'datePickerUtils', 'dateTimeConfig', function ($compile, datePickerUtils, dateTimeConfig) {
+angular.module('datePicker')
+  .directive('dateRange', ['$compile', 'datePickerUtils', 'dateTimeConfig', function ($compile, datePickerUtils, dateTimeConfig) {
     function getTemplate(attrs, id, model, min, max) {
       return dateTimeConfig.template(angular.extend(attrs, {
         ngModel: model,
@@ -694,21 +679,12 @@ var Module = angular.module('datePicker');
       }
     };
   }]);
-//}));
 
-//(function (global, factory) {
-//  'use strict';
-//  var fnc;
-//  fnc = (typeof exports === 'object' && typeof module !== 'undefined') ? module.exports = factory(require('angular'), require('moment')) :
-//    (typeof define === 'function' && define.amd) ? define(['angular', 'moment'], factory) :
-//      factory(global.angular, global.moment);
-//}(this, function (angular, moment) {
 var PRISTINE_CLASS = 'ng-pristine',
     DIRTY_CLASS = 'ng-dirty';
 
-  var Module = angular.module('datePicker');
-
-  Module.constant('dateTimeConfig', {
+angular.module('datePicker')
+  .constant('dateTimeConfig', {
     template: function (attrs, id) {
       return '' +
         '<div ' +
@@ -733,9 +709,8 @@ var PRISTINE_CLASS = 'ng-pristine',
     views: ['date', 'year', 'month', 'hours', 'minutes'],
     autoClose: false,
     position: 'relative'
-  });
-
-  Module.directive('dateTimeAppend', function () {
+  })
+  .directive('dateTimeAppend', function () {
     return {
       link: function (scope, element) {
         element.bind('click', function () {
@@ -743,9 +718,8 @@ var PRISTINE_CLASS = 'ng-pristine',
         });
       }
     };
-  });
-
-  Module.directive('dateTime', ['$compile', '$document', '$filter', 'dateTimeConfig', '$parse', 'datePickerUtils', function ($compile, $document, $filter, dateTimeConfig, $parse, datePickerUtils) {
+  })
+  .directive('dateTime', ['$compile', '$document', '$filter', 'dateTimeConfig', '$parse', 'datePickerUtils', function ($compile, $document, $filter, dateTimeConfig, $parse, datePickerUtils) {
     var body = $document.find('body');
     var dateFilter = $filter('mFormat');
 
@@ -780,14 +754,19 @@ var PRISTINE_CLASS = 'ng-pristine',
         views.unshift(view);
 
         function formatter(value) {
-          return dateFilter(value, format, timezone);
+          if (value) {
+            return dateFilter(value, format, timezone);
+          }
         }
 
         function parser(viewValue) {
-          if (viewValue.length === format.length) {
-            return viewValue;
+          if (!viewValue) {
+            return '';
           }
-          return (viewValue.length === 0) ? viewValue : undefined;
+          var parsed = moment(viewValue, format);
+          if (parsed.isValid()) {
+            return parsed;
+          }
         }
 
         function setMin(date) {
@@ -947,228 +926,120 @@ var PRISTINE_CLASS = 'ng-pristine',
         }
 
         element.bind('focus', showPicker);
-        element.bind('click', showPicker);
         element.bind('blur', clear);
         getTemplate();
       }
     };
   }]);
-//}));
 
 angular.module('datePicker').run(['$templateCache', function($templateCache) {
 $templateCache.put('templates/datepicker.html',
-    "<div ng-switch=\"view\">\r" +
-    "\n" +
-    "  <div ng-switch-when=\"date\">\r" +
-    "\n" +
-    "    <table>\r" +
-    "\n" +
-    "      <thead>\r" +
-    "\n" +
-    "      <tr>\r" +
-    "\n" +
-    "        <th ng-click=\"prev()\">&lsaquo;</th>\r" +
-    "\n" +
-    "        <th colspan=\"5\" class=\"switch\" ng-click=\"setView('month')\" ng-bind=\"date|mFormat:'YYYY MMMM':tz\"></th>\r" +
-    "\n" +
-    "        <th ng-click=\"next()\">&rsaquo;</i></th>\r" +
-    "\n" +
-    "      </tr>\r" +
-    "\n" +
-    "      <tr>\r" +
-    "\n" +
-    "        <th ng-repeat=\"day in weekdays\" style=\"overflow: hidden\" ng-bind=\"day|mFormat:'ddd':tz\"></th>\r" +
-    "\n" +
-    "      </tr>\r" +
-    "\n" +
-    "      </thead>\r" +
-    "\n" +
-    "      <tbody>\r" +
-    "\n" +
-    "      <tr ng-repeat=\"week in weeks\" ng-init=\"$index2 = $index\">\r" +
-    "\n" +
-    "        <td ng-repeat=\"day in week\">\r" +
-    "\n" +
-    "          <span\r" +
-    "\n" +
-    "            ng-class=\"classes[$index2][$index]\"\r" +
-    "\n" +
-    "            ng-click=\"selectDate(day)\" ng-bind=\"day|mFormat:'DD':tz\"></span>\r" +
-    "\n" +
-    "        </td>\r" +
-    "\n" +
-    "      </tr>\r" +
-    "\n" +
-    "      </tbody>\r" +
-    "\n" +
-    "    </table>\r" +
-    "\n" +
-    "  </div>\r" +
-    "\n" +
-    "  <div ng-switch-when=\"year\">\r" +
-    "\n" +
-    "    <table>\r" +
-    "\n" +
-    "      <thead>\r" +
-    "\n" +
-    "      <tr>\r" +
-    "\n" +
-    "        <th ng-click=\"prev(10)\">&lsaquo;</th>\r" +
-    "\n" +
-    "        <th colspan=\"5\" class=\"switch\"ng-bind=\"years[0].year()+' - '+years[years.length-1].year()\"></th>\r" +
-    "\n" +
-    "        <th ng-click=\"next(10)\">&rsaquo;</i></th>\r" +
-    "\n" +
-    "      </tr>\r" +
-    "\n" +
-    "      </thead>\r" +
-    "\n" +
-    "      <tbody>\r" +
-    "\n" +
-    "      <tr>\r" +
-    "\n" +
-    "        <td colspan=\"7\">\r" +
-    "\n" +
-    "          <span ng-class=\"classes[$index]\"\r" +
-    "\n" +
-    "                ng-repeat=\"year in years\"\r" +
-    "\n" +
-    "                ng-click=\"selectDate(year)\" ng-bind=\"year.year()\"></span>\r" +
-    "\n" +
-    "        </td>\r" +
-    "\n" +
-    "      </tr>\r" +
-    "\n" +
-    "      </tbody>\r" +
-    "\n" +
-    "    </table>\r" +
-    "\n" +
-    "  </div>\r" +
-    "\n" +
-    "  <div ng-switch-when=\"month\">\r" +
-    "\n" +
-    "    <table>\r" +
-    "\n" +
-    "      <thead>\r" +
-    "\n" +
-    "      <tr>\r" +
-    "\n" +
-    "        <th ng-click=\"prev()\">&lsaquo;</th>\r" +
-    "\n" +
-    "        <th colspan=\"5\" class=\"switch\" ng-click=\"setView('year')\" ng-bind=\"date|mFormat:'YYYY':tz\"></th>\r" +
-    "\n" +
-    "        <th ng-click=\"next()\">&rsaquo;</i></th>\r" +
-    "\n" +
-    "      </tr>\r" +
-    "\n" +
-    "      </thead>\r" +
-    "\n" +
-    "      <tbody>\r" +
-    "\n" +
-    "      <tr>\r" +
-    "\n" +
-    "        <td colspan=\"7\">\r" +
-    "\n" +
-    "          <span ng-repeat=\"month in months\"\r" +
-    "\n" +
-    "                ng-class=\"classes[$index]\"\r" +
-    "\n" +
-    "                ng-click=\"selectDate(month)\"\r" +
-    "\n" +
-    "                ng-bind=\"month|mFormat:'MMM':tz\"></span>\r" +
-    "\n" +
-    "        </td>\r" +
-    "\n" +
-    "      </tr>\r" +
-    "\n" +
-    "      </tbody>\r" +
-    "\n" +
-    "    </table>\r" +
-    "\n" +
-    "  </div>\r" +
-    "\n" +
-    "  <div ng-switch-when=\"hours\">\r" +
-    "\n" +
-    "    <table>\r" +
-    "\n" +
-    "      <thead>\r" +
-    "\n" +
-    "      <tr>\r" +
-    "\n" +
-    "        <th ng-click=\"prev(24)\">&lsaquo;</th>\r" +
-    "\n" +
-    "        <th colspan=\"5\" class=\"switch\" ng-click=\"setView('date')\" ng-bind=\"date|mFormat:'DD MMMM YYYY':tz\"></th>\r" +
-    "\n" +
-    "        <th ng-click=\"next(24)\">&rsaquo;</i></th>\r" +
-    "\n" +
-    "      </tr>\r" +
-    "\n" +
-    "      </thead>\r" +
-    "\n" +
-    "      <tbody>\r" +
-    "\n" +
-    "      <tr>\r" +
-    "\n" +
-    "        <td colspan=\"7\">\r" +
-    "\n" +
-    "          <span ng-repeat=\"hour in hours\"\r" +
-    "\n" +
-    "                ng-class=\"classes[$index]\"\r" +
-    "\n" +
-    "                ng-click=\"selectDate(hour)\" ng-bind=\"hour|mFormat:'HH:mm':tz\"></span>\r" +
-    "\n" +
-    "        </td>\r" +
-    "\n" +
-    "      </tr>\r" +
-    "\n" +
-    "      </tbody>\r" +
-    "\n" +
-    "    </table>\r" +
-    "\n" +
-    "  </div>\r" +
-    "\n" +
-    "  <div ng-switch-when=\"minutes\">\r" +
-    "\n" +
-    "    <table>\r" +
-    "\n" +
-    "      <thead>\r" +
-    "\n" +
-    "      <tr>\r" +
-    "\n" +
-    "        <th ng-click=\"prev()\">&lsaquo;</th>\r" +
-    "\n" +
-    "        <th colspan=\"5\" class=\"switch\" ng-click=\"setView('hours')\" ng-bind=\"date|mFormat:'DD MMMM YYYY':tz\"></th>\r" +
-    "\n" +
-    "        <th ng-click=\"next()\">&rsaquo;</i></th>\r" +
-    "\n" +
-    "      </tr>\r" +
-    "\n" +
-    "      </thead>\r" +
-    "\n" +
-    "      <tbody>\r" +
-    "\n" +
-    "      <tr>\r" +
-    "\n" +
-    "        <td colspan=\"7\">\r" +
-    "\n" +
-    "          <span ng-repeat=\"minute in minutes\"\r" +
-    "\n" +
-    "                ng-class=\"classes[$index]\"\r" +
-    "\n" +
-    "                ng-click=\"selectDate(minute)\"\r" +
-    "\n" +
-    "                ng-bind=\"minute|mFormat:'HH:mm':tz\"></span>\r" +
-    "\n" +
-    "        </td>\r" +
-    "\n" +
-    "      </tr>\r" +
-    "\n" +
-    "      </tbody>\r" +
-    "\n" +
-    "    </table>\r" +
-    "\n" +
-    "  </div>\r" +
-    "\n" +
+    "<div ng-switch=\"view\">\n" +
+    "  <div ng-switch-when=\"date\">\n" +
+    "    <table>\n" +
+    "      <thead>\n" +
+    "      <tr>\n" +
+    "        <th ng-click=\"prev()\">&lsaquo;</th>\n" +
+    "        <th colspan=\"5\" class=\"switch\" ng-click=\"setView('month')\" ng-bind=\"date|mFormat:'YYYY MMMM':tz\"></th>\n" +
+    "        <th ng-click=\"next()\">&rsaquo;</i></th>\n" +
+    "      </tr>\n" +
+    "      <tr>\n" +
+    "        <th ng-repeat=\"day in weekdays\" style=\"overflow: hidden\" ng-bind=\"day|mFormat:'ddd':tz\"></th>\n" +
+    "      </tr>\n" +
+    "      </thead>\n" +
+    "      <tbody>\n" +
+    "      <tr ng-repeat=\"week in weeks\" ng-init=\"$index2 = $index\">\n" +
+    "        <td ng-repeat=\"day in week\">\n" +
+    "          <span\n" +
+    "            ng-class=\"classes[$index2][$index]\"\n" +
+    "            ng-click=\"selectDate(day)\" ng-bind=\"day|mFormat:'DD':tz\"></span>\n" +
+    "        </td>\n" +
+    "      </tr>\n" +
+    "      </tbody>\n" +
+    "    </table>\n" +
+    "  </div>\n" +
+    "  <div ng-switch-when=\"year\">\n" +
+    "    <table>\n" +
+    "      <thead>\n" +
+    "      <tr>\n" +
+    "        <th ng-click=\"prev(10)\">&lsaquo;</th>\n" +
+    "        <th colspan=\"5\" class=\"switch\"ng-bind=\"years[0].year()+' - '+years[years.length-1].year()\"></th>\n" +
+    "        <th ng-click=\"next(10)\">&rsaquo;</i></th>\n" +
+    "      </tr>\n" +
+    "      </thead>\n" +
+    "      <tbody>\n" +
+    "      <tr>\n" +
+    "        <td colspan=\"7\">\n" +
+    "          <span ng-class=\"classes[$index]\"\n" +
+    "                ng-repeat=\"year in years\"\n" +
+    "                ng-click=\"selectDate(year)\" ng-bind=\"year.year()\"></span>\n" +
+    "        </td>\n" +
+    "      </tr>\n" +
+    "      </tbody>\n" +
+    "    </table>\n" +
+    "  </div>\n" +
+    "  <div ng-switch-when=\"month\">\n" +
+    "    <table>\n" +
+    "      <thead>\n" +
+    "      <tr>\n" +
+    "        <th ng-click=\"prev()\">&lsaquo;</th>\n" +
+    "        <th colspan=\"5\" class=\"switch\" ng-click=\"setView('year')\" ng-bind=\"date|mFormat:'YYYY':tz\"></th>\n" +
+    "        <th ng-click=\"next()\">&rsaquo;</i></th>\n" +
+    "      </tr>\n" +
+    "      </thead>\n" +
+    "      <tbody>\n" +
+    "      <tr>\n" +
+    "        <td colspan=\"7\">\n" +
+    "          <span ng-repeat=\"month in months\"\n" +
+    "                ng-class=\"classes[$index]\"\n" +
+    "                ng-click=\"selectDate(month)\"\n" +
+    "                ng-bind=\"month|mFormat:'MMM':tz\"></span>\n" +
+    "        </td>\n" +
+    "      </tr>\n" +
+    "      </tbody>\n" +
+    "    </table>\n" +
+    "  </div>\n" +
+    "  <div ng-switch-when=\"hours\">\n" +
+    "    <table>\n" +
+    "      <thead>\n" +
+    "      <tr>\n" +
+    "        <th ng-click=\"prev(24)\">&lsaquo;</th>\n" +
+    "        <th colspan=\"5\" class=\"switch\" ng-click=\"setView('date')\" ng-bind=\"date|mFormat:'DD MMMM YYYY':tz\"></th>\n" +
+    "        <th ng-click=\"next(24)\">&rsaquo;</i></th>\n" +
+    "      </tr>\n" +
+    "      </thead>\n" +
+    "      <tbody>\n" +
+    "      <tr>\n" +
+    "        <td colspan=\"7\">\n" +
+    "          <span ng-repeat=\"hour in hours\"\n" +
+    "                ng-class=\"classes[$index]\"\n" +
+    "                ng-click=\"selectDate(hour)\" ng-bind=\"hour|mFormat:'HH:mm':tz\"></span>\n" +
+    "        </td>\n" +
+    "      </tr>\n" +
+    "      </tbody>\n" +
+    "    </table>\n" +
+    "  </div>\n" +
+    "  <div ng-switch-when=\"minutes\">\n" +
+    "    <table>\n" +
+    "      <thead>\n" +
+    "      <tr>\n" +
+    "        <th ng-click=\"prev()\">&lsaquo;</th>\n" +
+    "        <th colspan=\"5\" class=\"switch\" ng-click=\"setView('hours')\" ng-bind=\"date|mFormat:'DD MMMM YYYY':tz\"></th>\n" +
+    "        <th ng-click=\"next()\">&rsaquo;</i></th>\n" +
+    "      </tr>\n" +
+    "      </thead>\n" +
+    "      <tbody>\n" +
+    "      <tr>\n" +
+    "        <td colspan=\"7\">\n" +
+    "          <span ng-repeat=\"minute in minutes\"\n" +
+    "                ng-class=\"classes[$index]\"\n" +
+    "                ng-click=\"selectDate(minute)\"\n" +
+    "                ng-bind=\"minute|mFormat:'HH:mm':tz\"></span>\n" +
+    "        </td>\n" +
+    "      </tr>\n" +
+    "      </tbody>\n" +
+    "    </table>\n" +
+    "  </div>\n" +
     "</div>"
   );
 
