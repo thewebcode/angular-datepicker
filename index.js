@@ -1,3 +1,2 @@
-require('./dist/index.js');
+require('./dist/angular-datepicker.js');
 module.exports = 'datePicker';
-
