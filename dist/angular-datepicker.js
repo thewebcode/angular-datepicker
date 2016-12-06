@@ -186,7 +186,7 @@ angular.module('datePicker', [])
         scope.$watch(watch, update);
 
         if (scope.watchDirectChanges) {
-          scope.$watch('model', function () {
+          scope.$watchCollection('model', function () {
             arrowClick = false;
             update();
           });
